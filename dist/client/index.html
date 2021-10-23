@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Three.js TypeScript Tutorials by Sean Bradley</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		*,
+		*::before,
+		*::after {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		::-webkit-scrollbar {
+			-webkit-appearance: none;
+			width: 7px;
+			height: 7px;
+		}
+
+		::-webkit-scrollbar-thumb {
+			border-radius: 4px;
+			background-color: grey;
+			box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+
+		}
+
+		body {
+			height: 100vh;
+			overflow: hidden;
+			margin: 0px;
+			display: flex;
+		}
+
+
+		.settings {
+			height: 100%;
+			width: 50%;
+			padding: 30px 70px;
+			font-family: Roboto, sans-serif;
+			background: #272727;
+			color: #E5E5E5;
+		}
+
+		.settings h1 {
+			font-weight: 500;
+		}
+
+		button {
+			background-color: #272727;
+			border: 1px solid #6DA0DD;
+			border-radius: 8px;
+			box-sizing: border-box;
+			color: #6DA0DD;
+			cursor: pointer;
+			display: inline-block;
+			font-size: 16px;
+			line-height: 20px;
+			outline: none;
+			padding: 8px 14px;
+			text-align: center;
+			text-decoration: none;
+			touch-action: manipulation;
+			transition: box-shadow .2s, -ms-transform .1s, -webkit-transform .1s, transform .1s;
+			user-select: none;
+			-webkit-user-select: none;
+			width: auto;
+		}
+
+		button:active {
+			background-color: #363636;
+			transform: scale(.96);
+		}
+
+		button#apply {
+			margin-left: 30px;
+		}
+
+		section {
+			margin-top: 25px;
+			width: 100%;
+			/* display: inline-block; */
+			float: left;
+		}
+
+		section main {
+			padding-top: 10px;
+		}
+
+		section.address,
+		section.backlight {
+			width: 50%;
+		}
+
+		section * {
+			font-weight: 300;
+		}
+
+		.sign-type {
+			display: block;
+			float: left;
+			margin-right: 20px;
+		}
+
+		.sign-type input {
+			display: none;
+		}
+
+		.sign-type label {
+			display: inline-block;
+			border-radius: 10px;
+			overflow: hidden;
+			background: #363636;
+			height: 60px;
+			border: 1px solid transparent;
+			cursor: pointer;
+		}
+
+		.sign-type input:checked+label {
+			border-color: white;
+		}
+
+		.sign-type label img {
+			height: 100%;
+		}
+
+		.input-wrapper {
+			margin-bottom: 10px;
+		}
+
+		.input-wrapper:last-child {
+			margin-bottom: 0;
+		}
+
+		.input-wrapper label {
+			display: block;
+			color: #AAAAAA;
+			font-size: 90%;
+			margin-bottom: 5px;
+		}
+
+		.input-wrapper input {
+			border: none;
+			-webkit-appearance: none;
+			-ms-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			background: #363636;
+			color: inherit;
+			padding: 8px 10px;
+			border-radius: 5px;
+			width: 250px;
+			font-size: 18px;
+		}
+
+		.input-wrapper select {
+			width: 250px;
+			padding: 8px 10px;
+			font-size: 18px;
+			border: none;
+			border-radius: 5px;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			color: inherit;
+			background: url(https://static.thenounproject.com/png/551749-200.png) 94% / 8% no-repeat #363636;
+		}
+
+		.switch input {
+			display: none;
+		}
+
+		.on,
+		.off {
+			width: 50px;
+			text-align: center;
+			padding: 8px 0px;
+			float: left;
+			color: #E5E5E5 !important;
+			font-size: 18px !important;
+			background: #363636;
+			cursor: pointer;
+		}
+
+		.on {
+			border-right: 1px solid #E5E5E5;
+			border-radius: 5px 0 0 5px;
+		}
+
+		.off {
+			border-radius: 0 5px 5px 0;
+		}
+
+		.switch input:checked+label {
+			background-color: #555555;
+		}
+
+		#preview {
+			height: 100%;
+			width: 50%;
+			background-color: #272727;
+		}
+
+		@media only screen and (max-width: 1000px) {
+
+			body {
+				flex-direction: column-reverse;
+			}
+
+			button#apply {
+				display: block;
+				margin-top: 10px;
+				margin-left: 0;
+			}
+
+			.settings,
+			#preview {
+				width: 100%;
+			}
+
+			.settings {
+				height: 65vh;
+				overflow-y: scroll;
+				overflow-x: hidden;
+				padding: 15px 20px;
+				padding-bottom: 150px;
+			}
+
+			section.address,
+			section.backlight {
+				width: 100%;
+			}
+
+			#preview {
+				height: 35vh;
+			}
+
+			section.type main {
+				display: flex;
+				overflow-x: scroll;
+			}
+
+			.sign-type {
+				margin-right: 20px;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div class="settings">
+		<h1>Sign settings <button id="apply">Apply changes</button></h1>
+		<section class="type">
+			<h2>Type</h2>
+			<main>
+				<div class="sign-type">
+					<input type="radio" name="type" id="type-1" value="0" checked>
+					<label for="type-1"><img src="img/sign_types/1.svg" alt=""></label>
+				</div>
+				<div class="sign-type">
+					<input type="radio" name="type" id="type-2" value="1">
+					<label for="type-2"><img src="img/sign_types/2.svg" alt=""></label>
+				</div>
+				<div class="sign-type">
+					<input type="radio" name="type" id="type-3" value="2">
+					<label for="type-3"><img src="img/sign_types/3.svg" alt=""></label>
+				</div>
+				<div class="sign-type">
+					<input type="radio" name="type" id="type-4" value="3">
+					<label for="type-4"><img src="img/sign_types/4.svg" alt=""></label>
+				</div>
+				<div class="sign-type">
+					<input type="radio" name="type" id="type-5" value="4">
+					<label for="type-5"><img src="img/sign_types/5.svg" alt=""></label>
+				</div>
+			</main>
+		</section>
+		<section class="address">
+			<h2>Address</h2>
+			<main>
+				<div class="input-wrapper">
+					<label for="address-line-1">Address Line 1</label>
+					<input type="text" id="address-line-1" name="address-line-1" value="Cooper">
+				</div>
+				<div class="input-wrapper">
+					<label for="address-line-2">Address Line 2</label>
+					<input type="text" id="address-line-2" name="address-line-2" value="Road">
+				</div>
+				<div class="input-wrapper">
+					<label for="street-number">Street Number</label>
+					<input type="text" id="street-number" name="street-number" value="12">
+				</div>
+			</main>
+		</section>
+		<section class="backlight">
+			<h2>Backlight</h2>
+			<main>
+				<div class="input-wrapper">
+					<label for="backlight-color">Color</label>
+					<select name="backlight-color" id="backlight-color">
+						<option value="no">No backlight</option>
+						<option value="0" selected="selected">White</option>
+						<option value="1">Yellow</option>
+					</select>
+				</div>
+				<div class="input-wrapper">
+					<label>Toggle backlight</label>
+					<div class="switch">
+						<input type="radio" name="toggle-backlight" id="backlight-on" value="on">
+						<label for="backlight-on" class="on">ON</label>
+
+						<input type="radio" name="toggle-backlight" id="backlight-off" value="off" checked="checked">
+						<label for="backlight-off" class="off">OFF</label>
+					</div>
+				</div>
+			</main>
+		</section>
+		<section class="price">
+			<h2>Price</h2>
+			<main>
+
+			</main>
+		</section>
+	</div>
+	<div id="preview"></div>
+
+
+	<script type="x-shader/x-vertex" id="vertexshader">
+
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}
+
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentshader">
+
+		uniform sampler2D baseTexture;
+		uniform sampler2D bloomTexture;
+
+		varying vec2 vUv;
+
+		void main() {
+
+			gl_FragColor = ( texture2D( baseTexture, vUv ) + vec4( 1.0 ) * texture2D( bloomTexture, vUv ) );
+
+		}
+
+	</script>
+
+	<script type="module" src="bundle.js"></script>
+</body>
+
+</html>
