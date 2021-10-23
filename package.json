@@ -1,6 +1,6 @@
 {
-  "name": "three.js-typescript-boilerplate",
-  "version": "1.0.0",
+  "name": "address-sign",
+  "version": "0.5.0",
   "description": "",
   "scripts": {
     "build": "webpack --config ./src/client/webpack.prod.js",
