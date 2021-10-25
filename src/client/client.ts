@@ -7,6 +7,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createWall } from './wall';
 import { Color, IPlateInput, plates } from './plates';
+import { FontProvider } from './fontsProvider';
 
 export interface IParams {
     streetNum: string;
@@ -40,13 +41,15 @@ class App {
         plateIndex: 0,
         num: '12',
         name: ['Cooper', 'Road'],
-        glowing: true,
-        color: Color.list[1],
-        fontId: 1,
-        scene: new THREE.Scene,
+        glowing: false,
+        colorId: 0,
+        fontId: 0,
+        scene: new THREE.Scene(),
     }
 
     constructor() {
+        this.renderDOM();
+
         this.preview = document.getElementById('preview') ?? document.body
         this.renderer = this.createRenderer()
         this.camera = this.createCamera()
@@ -207,26 +210,6 @@ class App {
         this.render()
     }
 
-    applyChanges() {
-        this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value)
-        this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
-
-        this.input.name = [
-            (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
-            (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
-        ]
-        const backlightOn = (document.getElementById('backlight-color') as HTMLInputElement)?.value != 'no'
-        if (backlightOn) {
-            this.input.glowing = (document.getElementById('backlight-on') as HTMLInputElement)?.checked;
-            this.input.color = Color.list[parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)]
-        } else {
-            this.input.glowing = false;
-            this.input.color = Color.list[0];
-        }
-
-        this.createPlate();
-    }
-
     render() {
         this.darkenNonBloomed()
         this.bloomComposer.render();
@@ -238,6 +221,41 @@ class App {
         this.controls.update()
         this.render()
         requestAnimationFrame(() => this.update())
+    }
+
+    applyChanges() {
+        this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value);
+        this.input.fontId = parseInt((document.getElementById('font') as HTMLInputElement)?.value);
+
+        this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
+
+        this.input.name = [
+            (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
+            (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
+        ]
+        const backlightOn = (document.getElementById('backlight-color') as HTMLInputElement)?.value != 'no'
+        this.input.glowing = (document.getElementById('backlight-on') as HTMLInputElement)?.checked;
+        this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)
+
+        this.createPlate();
+    }
+
+    renderDOM() {
+        const fontSelector = document.getElementById('font') as HTMLInputElement
+        fontSelector.innerHTML = FontProvider.getInstance().fonts.map(
+            (f, i) => `<option value="${i}" ${i == this.input.fontId ? 'selected="selected"' : ''}>${f.name}</option>`,
+        ).join('\n');
+
+        (document.getElementById('street-number') as HTMLInputElement).value = this.input.num;
+        (document.getElementById('address-line-1') as HTMLInputElement).value = this.input.name[0];
+        (document.getElementById('address-line-2') as HTMLInputElement).value = this.input.name[1];
+        (document.getElementById('backlight-on') as HTMLInputElement).checked = this.input.glowing;
+
+        const colorSelector = document.getElementById('backlight-color') as HTMLInputElement
+        colorSelector.innerHTML = `<option value="no">No backlight</option> \n`
+        colorSelector.innerHTML += Color.list.map(
+            (c, i) => `<option value="${i}" ${i == this.input.colorId ? 'selected="selected"' : ''}>${c.name}</option>`,
+        ).join('\n');
     }
 }
 

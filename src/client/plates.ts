@@ -39,7 +39,7 @@ export interface IPlateInput {
     num: string;
     name: string[];
     glowing: boolean;
-    color: Color;
+    colorId: number;
     fontId: number;
     scene: THREE.Scene;   // DEBUG ONLY
 }
@@ -154,7 +154,7 @@ class Plate {
 
         const backlightMesh = new THREE.Mesh(
             roundedRectGeometry(plateWidth - 1, plateHeight - 1, 0.01, params.radius!),
-            new THREE.MeshPhongMaterial({ color: input.glowing ? input.color.lightValue : input.color.value })
+            new THREE.MeshPhongMaterial({ color: input.glowing ? Color.list[input.colorId].lightValue : Color.list[input.colorId].value })
         )
         backlightMesh.name = 'backlightMesh'
         backlightMesh.position.set(0, 0, -params.depth! / 2)

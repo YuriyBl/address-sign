@@ -41,9 +41,9 @@ export class Font {
 
 export class FontProvider {
     private static instance: FontProvider;
-    private fonts = [
-        new Font('fonts/Magettas_Regular.json', 'Magettas'),
+    fonts = [
         new Font('fonts/Post_No_Bills_Colombo_Medium.json', 'Post No Bills Colombo'),
+        new Font('fonts/Magettas_Regular.json', 'Magettas'),
     ];
 
     async getFont(id: number): Promise<Font> {
