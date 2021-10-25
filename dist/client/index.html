@@ -2,7 +2,7 @@
 <html>
 
 <head>
-	<title>Three.js TypeScript Tutorials by Sean Bradley</title>
+	<title>Address Sign 3D</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<style>
 		*,
@@ -97,10 +97,11 @@
 			font-weight: 300;
 		}
 
-		.sign-type {
-			display: block;
-			float: left;
-			margin-right: 20px;
+		.types {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-bottom: 10px;
 		}
 
 		.sign-type input {
@@ -165,6 +166,7 @@
 			appearance: none;
 			color: inherit;
 			background: url(https://static.thenounproject.com/png/551749-200.png) 94% / 8% no-repeat #363636;
+			cursor: pointer;
 		}
 
 		.switch input {
@@ -254,25 +256,34 @@
 		<section class="type">
 			<h2>Type</h2>
 			<main>
-				<div class="sign-type">
-					<input type="radio" name="type" id="type-1" value="0" checked>
-					<label for="type-1"><img src="img/sign_types/1.svg" alt=""></label>
+				<div class="types">
+					<div class="sign-type">
+						<input type="radio" name="type" id="type-1" value="0" checked>
+						<label for="type-1"><img src="img/sign_types/1.svg" alt=""></label>
+					</div>
+					<div class="sign-type">
+						<input type="radio" name="type" id="type-2" value="1">
+						<label for="type-2"><img src="img/sign_types/2.svg" alt=""></label>
+					</div>
+					<div class="sign-type">
+						<input type="radio" name="type" id="type-3" value="2">
+						<label for="type-3"><img src="img/sign_types/3.svg" alt=""></label>
+					</div>
+					<div class="sign-type">
+						<input type="radio" name="type" id="type-4" value="3">
+						<label for="type-4"><img src="img/sign_types/4.svg" alt=""></label>
+					</div>
+					<div class="sign-type">
+						<input type="radio" name="type" id="type-5" value="4">
+						<label for="type-5"><img src="img/sign_types/5.svg" alt=""></label>
+					</div>
 				</div>
-				<div class="sign-type">
-					<input type="radio" name="type" id="type-2" value="1">
-					<label for="type-2"><img src="img/sign_types/2.svg" alt=""></label>
-				</div>
-				<div class="sign-type">
-					<input type="radio" name="type" id="type-3" value="2">
-					<label for="type-3"><img src="img/sign_types/3.svg" alt=""></label>
-				</div>
-				<div class="sign-type">
-					<input type="radio" name="type" id="type-4" value="3">
-					<label for="type-4"><img src="img/sign_types/4.svg" alt=""></label>
-				</div>
-				<div class="sign-type">
-					<input type="radio" name="type" id="type-5" value="4">
-					<label for="type-5"><img src="img/sign_types/5.svg" alt=""></label>
+				<div class="input-wrapper">
+					<label for="font">Font</label>
+					<select name="font" id="font">
+						<option value="0" selected="selected">Magettas</option>
+						<option value="1">Post No Bills Colombo</option>
+					</select>
 				</div>
 			</main>
 		</section>

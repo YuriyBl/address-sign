@@ -94,6 +94,7 @@ class App {
         controls.maxPolarAngle = 3 * Math.PI / 4
         controls.minAzimuthAngle = - Math.PI / 3
         controls.maxAzimuthAngle = Math.PI / 3
+        controls.enablePan = false
 
         return controls
     }
@@ -210,16 +211,10 @@ class App {
         this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value)
         this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
 
-        if (plates[this.input.plateIndex].params.nameIsTwoLines) {
-            this.input.name = [
-                (document.getElementById('address-line-1') as HTMLInputElement)?.value,
-                (document.getElementById('address-line-2') as HTMLInputElement)?.value,
-            ]
-        } else {
-            this.input.name = [
-                (document.getElementById('address-line-1') as HTMLInputElement)?.value,
-            ]
-        }
+        this.input.name = [
+            (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
+            (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
+        ]
         const backlightOn = (document.getElementById('backlight-color') as HTMLInputElement)?.value != 'no'
         if (backlightOn) {
             this.input.glowing = (document.getElementById('backlight-on') as HTMLInputElement)?.checked;
