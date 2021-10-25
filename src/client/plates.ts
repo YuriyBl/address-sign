@@ -6,6 +6,7 @@ import objectSize from './utils/objectSize';
 import { FontProvider } from './fontsProvider';
 import { Font } from './fontsProvider';
 import { genTextMesh } from './utils/genTextMesh';
+import { twoSideArrowGeometry } from './utils/twoSideArrow';
 
 
 class Margin {
@@ -163,7 +164,39 @@ class Plate {
         return [engravedPlateMesh, backlightMesh];
     }
 
+    static async genDimensionsArrows(width: number, height: number) {
+        const dimensionsArrows = new THREE.Group()
 
+        const horizontalArrow = new THREE.Mesh(twoSideArrowGeometry(0.25, width, 0.01), new THREE.MeshPhongMaterial())
+        horizontalArrow.translateY(height / 2 + 1.5)
+        const horizontalText = genTextMesh({
+            text: '123',
+            font: (await FontProvider.getInstance().getDimensionsFont()).content!,
+            size: 1,
+            depth: 0.01
+        })
+        const horizontalTextSize = meshSize(horizontalText)
+        horizontalText.translateY(height / 2 + 2)
+        horizontalText.translateX(-horizontalTextSize.x / 2)
+
+        const verticalArrow = new THREE.Mesh(twoSideArrowGeometry(0.25, height, 0.01), new THREE.MeshPhongMaterial())
+        verticalArrow.translateX(-width / 2 - 1.5)
+        verticalArrow.rotateZ(Math.PI / 2)
+        const verticalText = genTextMesh({
+            text: '123',
+            font: (await FontProvider.getInstance().getDimensionsFont()).content!,
+            size: 1,
+            depth: 0.01
+        })
+        const verticalTextSize = meshSize(verticalText)
+        verticalText.translateX(-width / 2 - 2)
+        verticalText.translateY(-verticalTextSize.x / 2)
+        verticalText.rotateZ(Math.PI / 2)
+
+        dimensionsArrows.add(horizontalArrow, horizontalText, verticalArrow, verticalText)
+
+        return dimensionsArrows
+    }
 }
 
 export const plates = [
@@ -200,7 +233,9 @@ export const plates = [
         let plateHeight = params.margin.v * 2 + engraveGroupSize.y;
 
         const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, plateHeight, engraveGroup, params, input);
-        plateGroup.add(engravedPlateMesh, backlightMesh);
+
+        const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, plateHeight);
+        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
         return [plateGroup, backlightMesh];
     }),
     new Plate({

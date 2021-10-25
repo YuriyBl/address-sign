@@ -41,6 +41,7 @@ export class Font {
 
 export class FontProvider {
     private static instance: FontProvider;
+    dimensionsFont = new Font('fonts/Roboto_Light.json', 'Roboto');
     fonts = [
         new Font('fonts/Post_No_Bills_Colombo_Medium.json', 'Post No Bills Colombo'),
         new Font('fonts/Magettas_Regular.json', 'Magettas'),
@@ -50,6 +51,11 @@ export class FontProvider {
         const font = this.fonts[id];
         if (!font.isLoaded()) await font.load();
         return font;
+    }
+
+    async getDimensionsFont(): Promise<Font> {
+        if (!this.dimensionsFont.isLoaded()) await this.dimensionsFont.load();
+        return this.dimensionsFont;
     }
 
     static getInstance(): FontProvider {
