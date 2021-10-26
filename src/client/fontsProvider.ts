@@ -41,7 +41,7 @@ export class Font {
 
 export class FontProvider {
     private static instance: FontProvider;
-    dimensionsFont = new Font('fonts/Roboto_Light.json', 'Roboto');
+    dimensionsFont = new Font('fonts/Roboto_Medium.json', 'Roboto');
     fonts = [
         new Font('fonts/Post_No_Bills_Colombo_Medium.json', 'Post No Bills Colombo'),
         new Font('fonts/Magettas_Regular.json', 'Magettas'),
