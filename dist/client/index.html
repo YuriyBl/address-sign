@@ -4,6 +4,8 @@
 <head>
 	<title>Address Sign 3D</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.css" rel="stylesheet"
+		type="text/css" />
 	<style>
 		*,
 		*::before,
@@ -88,9 +90,11 @@
 			padding-top: 10px;
 		}
 
-		section.address,
-		section.backlight {
-			width: 50%;
+		section.address .row {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+			gap: 20px;
 		}
 
 		section * {
@@ -169,39 +173,67 @@
 			cursor: pointer;
 		}
 
-		.switch input {
-			display: none;
-		}
-
-		.on,
-		.off {
-			width: 50px;
-			text-align: center;
-			padding: 8px 0px;
-			float: left;
-			color: #E5E5E5 !important;
-			font-size: 18px !important;
-			background: #363636;
-			cursor: pointer;
-		}
-
-		.on {
-			border-right: 1px solid #E5E5E5;
-			border-radius: 5px 0 0 5px;
-		}
-
-		.off {
-			border-radius: 0 5px 5px 0;
-		}
-
-		.switch input:checked+label {
-			background-color: #555555;
-		}
-
 		#preview {
 			height: 100%;
 			width: 50%;
 			background-color: #272727;
+			position: relative;
+		}
+
+		.buttons {
+			height: 100%;
+			width: 30px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			gap: 10px;
+			padding-left: 10px;
+		}
+
+		.buttons .button input {
+			display: none;
+		}
+
+		.buttons .button label {
+			display: block;
+			width: 55px;
+			height: 55px;
+			line-height: 60px;
+			text-align: center;
+			border-radius: 100%;
+			background-color: rgba(255, 255, 255, .4);
+			opacity: 0.5;
+			cursor: pointer;
+		}
+
+		.buttons .button input:checked+label {
+			opacity: 1;
+		}
+
+		.buttons .button label::before {
+			font-size: 30px;
+			font-family: 'Font Awesome 5 Pro';
+			font-weight: 300;
+		}
+
+		.buttons .button.backlight input+label::before {
+			content: "\f0eb";
+		}
+
+		.buttons .button.backlight input:checked+label::before {
+			content: "\f672";
+		}
+
+		.buttons .button.dimensions input+label::before {
+			content: "\f31e";
+		}
+
+		.buttons .button.dimensions input:checked+label::before {
+			content: "\f31e";
+			font-weight: 600;
 		}
 
 		@media only screen and (max-width: 1000px) {
@@ -227,11 +259,6 @@
 				overflow-x: hidden;
 				padding: 15px 20px;
 				padding-bottom: 150px;
-			}
-
-			section.address,
-			section.backlight {
-				width: 100%;
 			}
 
 			#preview {
@@ -287,35 +314,24 @@
 		<section class="address">
 			<h2>Address</h2>
 			<main>
-				<div class="input-wrapper">
-					<label for="address-line-1">Address Line 1</label>
-					<input type="text" id="address-line-1" name="address-line-1">
+				<div class="row">
+					<div class="input-wrapper">
+						<label for="address-line-1">Address Line 1</label>
+						<input type="text" id="address-line-1" name="address-line-1">
+					</div>
+					<div class="input-wrapper">
+						<label for="address-line-2">Address Line 2</label>
+						<input type="text" id="address-line-2" name="address-line-2">
+					</div>
 				</div>
-				<div class="input-wrapper">
-					<label for="address-line-2">Address Line 2</label>
-					<input type="text" id="address-line-2" name="address-line-2">
-				</div>
-				<div class="input-wrapper">
-					<label for="street-number">Street Number</label>
-					<input type="text" id="street-number" name="street-number">
-				</div>
-			</main>
-		</section>
-		<section class="backlight">
-			<h2>Backlight</h2>
-			<main>
-				<div class="input-wrapper">
-					<label for="backlight-color">Color</label>
-					<select name="backlight-color" id="backlight-color"></select>
-				</div>
-				<div class="input-wrapper">
-					<label>Toggle backlight</label>
-					<div class="switch">
-						<input type="radio" name="toggle-backlight" id="backlight-on" value="on">
-						<label for="backlight-on" class="on">ON</label>
-
-						<input type="radio" name="toggle-backlight" id="backlight-off" value="off" checked="checked">
-						<label for="backlight-off" class="off">OFF</label>
+				<div class="row">
+					<div class="input-wrapper">
+						<label for="street-number">Street Number</label>
+						<input type="text" id="street-number" name="street-number">
+					</div>
+					<div class="input-wrapper">
+						<label for="backlight-color">Color</label>
+						<select name="backlight-color" id="backlight-color"></select>
 					</div>
 				</div>
 			</main>
@@ -327,7 +343,19 @@
 			</main>
 		</section>
 	</div>
-	<div id="preview"></div>
+	<div id="preview">
+		<div class="buttons">
+			<div class="button backlight">
+				<input type="checkbox" name="toggle-backlight" id="toggle-backlight">
+				<label for="toggle-backlight"> </label>
+			</div>
+
+			<div class="button dimensions">
+				<input type="checkbox" name="toggle-dimensions" id="toggle-dimensions">
+				<label for="toggle-dimensions"> </label>
+			</div>
+		</div>
+	</div>
 
 
 	<script type="x-shader/x-vertex" id="vertexshader">

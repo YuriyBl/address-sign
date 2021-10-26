@@ -72,9 +72,9 @@ const DEFAULT_PLATE_PARAMS: IPlateParams = {
 
 class Plate {
     params: IPlateParams;
-    generate: (text: IPlateInput) => Promise<[THREE.Group, THREE.Mesh]>;
+    generate: (text: IPlateInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>;
 
-    constructor(params: IPlateParams, generate: (params: IPlateParams) => (text: IPlateInput) => Promise<[THREE.Group, THREE.Mesh]>) {
+    constructor(params: IPlateParams, generate: (params: IPlateParams) => (text: IPlateInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>) {
         this.params = { ...DEFAULT_PLATE_PARAMS, ...params };
         this.generate = generate(this.params);
     }
@@ -138,7 +138,7 @@ class Plate {
         return lineMesh;
     }
 
-    static genPlates(plateWidth: number, plateHeight: number, engraveGroup: THREE.Group, params: IPlateParams, input: IPlateInput): [THREE.Mesh, THREE.Mesh] {
+    static genPlates(plateWidth: number, plateHeight: number, engraveGroup: THREE.Group, params: IPlateParams, input: IPlateInput): [THREE.Mesh, THREE.Mesh, THREE.Mesh] {
         const plateMesh = new THREE.Mesh(
             roundedRectGeometry(plateWidth, plateHeight, params.depth!, params.radius!),
         )
@@ -156,15 +156,22 @@ class Plate {
         const engravedPlateMesh = CSG.toMesh(engravedPlateCSG, new THREE.Matrix4(), params.material)
         engravedPlateMesh.name = 'plateMesh'
 
+        const backlightMeshGlowing = new THREE.Mesh(
+            roundedRectGeometry(plateWidth - 1, plateHeight - 1, 0.01, params.radius!),
+            new THREE.MeshPhongMaterial({ color: Color.list[input.colorId].lightValue })
+        )
+        backlightMeshGlowing.name = 'backlightMeshGlowing'
+        backlightMeshGlowing.position.set(0, 0, -params.depth! / 2)
+        backlightMeshGlowing.layers.enable(1);                       // TODO: BLOOM_SCENE = 1
+
         const backlightMesh = new THREE.Mesh(
             roundedRectGeometry(plateWidth - 1, plateHeight - 1, 0.01, params.radius!),
-            new THREE.MeshPhongMaterial({ color: input.glowing ? Color.list[input.colorId].lightValue : Color.list[input.colorId].value })
+            new THREE.MeshPhongMaterial({ color: Color.list[input.colorId].value })
         )
         backlightMesh.name = 'backlightMesh'
         backlightMesh.position.set(0, 0, -params.depth! / 2)
-        if (input.glowing) backlightMesh.layers.enable(1);       // TODO: BLOOM_SCENE = 1
 
-        return [engravedPlateMesh, backlightMesh];
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh];
     }
 
     static async genDimensionsArrows(width: number, height: number) {
@@ -210,8 +217,7 @@ export const plates = [
         nameSize: 2.3,
         nameIsTwoLines: true,
         margin: new Margin(2, 2, 1.5)
-    }, (params) => async (input: IPlateInput): Promise<[THREE.Group, THREE.Mesh]> => {
-        const plateGroup = new THREE.Group();
+    }, (params) => async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
         const font = await FontProvider.getInstance().getFont(input.fontId);
 
         const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -234,19 +240,18 @@ export const plates = [
         engraveGroup.add(numTextMesh, nameTextMesh, lineMesh)
         engraveGroup.traverse((o) => { o.translateX(-plateWidth / 2); o.translateY(-params.numSize / 2) })
 
-        const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+        const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
 
         const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, params.height!);
-        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
-        return [plateGroup, backlightMesh];
+
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
         numSize: 6.0,
         nameSize: 3.5,
         nameIsTwoLines: false,
         margin: new Margin(2, 2)
-    }, (params) => async (input: IPlateInput): Promise<[THREE.Group, THREE.Mesh]> => {
-        const plateGroup = new THREE.Group();
+    }, (params) => async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
         const font = await FontProvider.getInstance().getFont(input.fontId);
 
         const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -272,11 +277,10 @@ export const plates = [
         engraveGroup.add(numTextMesh, nameTextMesh, lineMesh)
         engraveGroup.traverse((o) => { o.translateX(-plateWidth / 2); o.translateY(-params.numSize / 2) })
 
-        const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+        const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
 
         const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, params.height!);
-        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
-        return [plateGroup, backlightMesh];
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
         height: 9.5,
@@ -284,8 +288,7 @@ export const plates = [
         nameSize: 1.5,
         nameIsTwoLines: false,
         margin: new Margin(1.5, 1, 0.4)
-    }, (params) => async (input: IPlateInput): Promise<[THREE.Group, THREE.Mesh]> => {
-        const plateGroup = new THREE.Group();
+    }, (params) => async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
         const font = await FontProvider.getInstance().getFont(input.fontId);
 
         const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -302,11 +305,10 @@ export const plates = [
         engraveGroup.add(numTextMesh, nameTextMesh)
         engraveGroup.traverse((o) => { o.translateX(-plateWidth / 2); o.translateY(-params.numSize / 2) })
 
-        const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+        const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
 
         const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, params.height!);
-        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
-        return [plateGroup, backlightMesh];
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
         height: 9.5,
@@ -314,8 +316,7 @@ export const plates = [
         nameSize: 1.5,
         nameIsTwoLines: false,
         margin: new Margin(1.5, 1, 0.4)
-    }, (params) => async (input: IPlateInput): Promise<[THREE.Group, THREE.Mesh]> => {
-        const plateGroup = new THREE.Group();
+    }, (params) => async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
         const font = await FontProvider.getInstance().getFont(input.fontId);
 
         const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -332,11 +333,10 @@ export const plates = [
         engraveGroup.add(numTextMesh, nameTextMesh)
         engraveGroup.traverse((o) => { o.translateX(-plateWidth / 2); o.translateY(-params.numSize / 2) })
 
-        const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+        const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
 
         const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, params.height!);
-        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
-        return [plateGroup, backlightMesh];
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
         height: 8.0,
@@ -344,7 +344,7 @@ export const plates = [
         nameSize: 0,
         nameIsTwoLines: false,
         margin: new Margin(2, 2)
-    }, (params) => async (input: IPlateInput): Promise<[THREE.Group, THREE.Mesh]> => {
+    }, (params) => async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
         const plateGroup = new THREE.Group();
         const font = await FontProvider.getInstance().getFont(input.fontId);
 
@@ -358,10 +358,9 @@ export const plates = [
         engraveGroup.add(numTextMesh)
         engraveGroup.traverse((o) => { o.translateX(-plateWidth / 2); o.translateY(-params.numSize / 2) })
 
-        const [engravedPlateMesh, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+        const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
 
         const dimensionsArrows = await Plate.genDimensionsArrows(plateWidth, params.height!);
-        plateGroup.add(engravedPlateMesh, backlightMesh, dimensionsArrows);
-        return [plateGroup, backlightMesh];
+        return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
 ]

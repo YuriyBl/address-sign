@@ -31,8 +31,10 @@ class App {
     darkMaterial = new THREE.MeshBasicMaterial({ color: "black" });
     materials: { [key: string]: THREE.Material | THREE.Material[] } = {};
 
-    plateGroup: THREE.Group;
+    plate: THREE.Mesh;
+    backlightMeshGlowing: THREE.Mesh;
     backlightMesh: THREE.Mesh;
+    dimensionsArrowsGroup: THREE.Group;
 
     private ENTIRE_SCENE = 0;
     private BLOOM_SCENE = 1;
@@ -59,8 +61,10 @@ class App {
         this.createLights()
         this.createWall()
 
-        this.plateGroup = new THREE.Group();
+        this.plate = new THREE.Mesh();
         this.backlightMesh = new THREE.Mesh();
+        this.backlightMeshGlowing = new THREE.Mesh();
+        this.dimensionsArrowsGroup = new THREE.Group();
         this.createPlate()
 
         const [bloomLayer, bloomComposer, finalComposer] = this.createBloom()
@@ -130,16 +134,18 @@ class App {
     }
 
     async createPlate() {
-        const [newPlateGroup, newBacklightMesh] = await plates[this.input.plateIndex].generate(this.input)
+        const [newPlate, newBacklightMeshGlowing, newBacklightMesh, newDimensionsArrowsGroup] = await plates[this.input.plateIndex].generate(this.input)
 
-        this.plateGroup.traverse((e) => {
-            if (e instanceof THREE.Mesh) e.geometry.dispose();
-        })
-        this.scene.remove(this.plateGroup);
+        this.scene.remove(this.plate, this.backlightMeshGlowing, this.backlightMesh, this.dimensionsArrowsGroup);
 
-        this.plateGroup = newPlateGroup;
+        this.plate = newPlate;
+        this.backlightMeshGlowing = newBacklightMeshGlowing;
         this.backlightMesh = newBacklightMesh;
-        this.scene.add(this.plateGroup);
+        this.dimensionsArrowsGroup = newDimensionsArrowsGroup;
+        this.scene.add(this.plate);
+
+        this.toggleBacklight()
+        this.toggleDimensions()
     }
 
     createBloom(): [THREE.Layers, EffectComposer, EffectComposer] {
@@ -233,11 +239,30 @@ class App {
             (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
             (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
         ]
-        const backlightOn = (document.getElementById('backlight-color') as HTMLInputElement)?.value != 'no'
-        this.input.glowing = (document.getElementById('backlight-on') as HTMLInputElement)?.checked;
+        this.input.glowing = (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
         this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)
 
         this.createPlate();
+    }
+
+    toggleBacklight() {
+        if ((document.getElementById('toggle-backlight') as HTMLInputElement).checked) {
+            this.scene.remove(this.backlightMesh)
+            this.scene.add(this.backlightMeshGlowing)
+        }
+        else {
+            this.scene.remove(this.backlightMeshGlowing)
+            this.scene.add(this.backlightMesh)
+        }
+    }
+
+    toggleDimensions() {
+        if ((document.getElementById('toggle-dimensions') as HTMLInputElement).checked) {
+            this.scene.add(this.dimensionsArrowsGroup)
+        }
+        else {
+            this.scene.remove(this.dimensionsArrowsGroup)
+        }
     }
 
     renderDOM() {
@@ -249,7 +274,7 @@ class App {
         (document.getElementById('street-number') as HTMLInputElement).value = this.input.num;
         (document.getElementById('address-line-1') as HTMLInputElement).value = this.input.name[0];
         (document.getElementById('address-line-2') as HTMLInputElement).value = this.input.name[1];
-        (document.getElementById('backlight-on') as HTMLInputElement).checked = this.input.glowing;
+        (document.getElementById('toggle-backlight') as HTMLInputElement).checked = this.input.glowing;
 
         const colorSelector = document.getElementById('backlight-color') as HTMLInputElement
         colorSelector.innerHTML = `<option value="no">No backlight</option> \n`
@@ -264,3 +289,5 @@ app.update();
 
 window.addEventListener('resize', (e) => app.onWindowResize(), false)
 document.getElementById('apply')?.addEventListener('click', (e) => app.applyChanges())
+document.getElementById('toggle-backlight')?.addEventListener('change', (e) => app.toggleBacklight())
+document.getElementById('toggle-dimensions')?.addEventListener('change', (e) => app.toggleDimensions())
