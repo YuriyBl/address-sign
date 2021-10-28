@@ -7,7 +7,7 @@ import { FontProvider } from './fontsProvider';
 import { Font } from './fontsProvider';
 import { genTextMesh } from './utils/genTextMesh';
 import { twoSideArrowGeometry } from './utils/twoSideArrow';
-import { UNITS_TO_MM } from './utils/const';
+import { UNITS_TO_MM, BLOOM_SCENE } from './utils/const';
 
 
 class Margin {
@@ -162,7 +162,7 @@ class Plate {
         )
         backlightMeshGlowing.name = 'backlightMeshGlowing'
         backlightMeshGlowing.position.set(0, 0, -params.depth! / 2)
-        backlightMeshGlowing.layers.enable(1);                       // TODO: BLOOM_SCENE = 1
+        backlightMeshGlowing.layers.enable(BLOOM_SCENE);
 
         const backlightMesh = new THREE.Mesh(
             roundedRectGeometry(plateWidth - 1, plateHeight - 1, 0.01, params.radius!),

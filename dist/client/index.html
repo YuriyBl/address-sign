@@ -33,6 +33,7 @@
 			overflow: hidden;
 			margin: 0px;
 			display: flex;
+			background: #272727;
 		}
 
 
@@ -40,8 +41,7 @@
 			height: 100%;
 			width: 50%;
 			padding: 30px 70px;
-			font-family: Roboto, sans-serif;
-			background: #272727;
+			font-family: 'Roboto', sans-serif;
 			color: #E5E5E5;
 		}
 
@@ -94,7 +94,6 @@
 			display: flex;
 			flex-wrap: wrap;
 			flex-direction: row;
-			gap: 20px;
 		}
 
 		section * {
@@ -132,11 +131,12 @@
 
 		.input-wrapper {
 			margin-bottom: 10px;
+			margin-right: 20px;
 		}
 
-		.input-wrapper:last-child {
+		/* .input-wrapper:last-child {
 			margin-bottom: 0;
-		}
+		} */
 
 		.input-wrapper label {
 			display: block;
@@ -169,7 +169,7 @@
 			-moz-appearance: none;
 			appearance: none;
 			color: inherit;
-			background: url(https://static.thenounproject.com/png/551749-200.png) 94% / 8% no-repeat #363636;
+			background: url(https://static.thenounproject.com/png/551749-200.png) center right 15px / 25px no-repeat #363636;
 			cursor: pointer;
 		}
 
@@ -261,17 +261,27 @@
 				padding-bottom: 150px;
 			}
 
+			.types {
+				flex-wrap: nowrap;
+				overflow-x: scroll;
+			}
+
 			#preview {
 				height: 35vh;
 			}
 
-			section.type main {
-				display: flex;
-				overflow-x: scroll;
-			}
-
 			.sign-type {
 				margin-right: 20px;
+			}
+		}
+
+		@media only screen and (max-width: 600px) {
+
+			.input-wrapper,
+			.input-wrapper input,
+			.input-wrapper select {
+				width: 100%;
+				margin-right: 0;
 			}
 		}
 	</style>

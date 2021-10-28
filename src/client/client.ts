@@ -8,17 +8,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createWall } from './wall';
 import { Color, IPlateInput, plates } from './plates';
 import { FontProvider } from './fontsProvider';
-
-export interface IParams {
-    streetNum: string;
-    streetName1: string;
-    streetName2: string;
-    glow: boolean;
-    backplateColor: 'white' | 'yellow';
-}
+import { BLOOM_SCENE } from './utils/const';
 
 class App {
-    preview: HTMLElement
+    viewDOM: HTMLElement
     renderer: THREE.WebGLRenderer
     camera: THREE.PerspectiveCamera
     controls: OrbitControls
@@ -36,9 +29,6 @@ class App {
     backlightMesh: THREE.Mesh;
     dimensionsArrowsGroup: THREE.Group;
 
-    private ENTIRE_SCENE = 0;
-    private BLOOM_SCENE = 1;
-
     input: IPlateInput = {
         plateIndex: 0,
         num: '12',
@@ -52,7 +42,7 @@ class App {
     constructor() {
         this.renderDOM();
 
-        this.preview = document.getElementById('preview') ?? document.body
+        this.viewDOM = document.getElementById('preview') ?? document.body
         this.renderer = this.createRenderer()
         this.camera = this.createCamera()
         this.controls = this.createControls()
@@ -79,22 +69,22 @@ class App {
             powerPreference: 'high-performance',
             alpha: true,
         })
-        renderer.setPixelRatio(1)
-        renderer.setSize(this.preview.clientWidth, this.preview.clientHeight)
-        // renderer.toneMapping = THREE.ReinhardToneMapping
-        document.getElementById('preview')?.appendChild(renderer.domElement)
+        renderer.setClearColor(0x393939, 0.14);
+        renderer.outputEncoding = THREE.sRGBEncoding
+        renderer.setSize(this.viewDOM.clientWidth, this.viewDOM.clientHeight)
+        this.viewDOM.appendChild(renderer.domElement)
         return renderer
     }
 
     createCamera(): THREE.PerspectiveCamera {
-        const aspect = this.renderer.domElement.clientWidth / this.renderer.domElement.clientHeight
+        const aspect = this.viewDOM.clientWidth / this.viewDOM.clientHeight
         const camera = new THREE.PerspectiveCamera(75, aspect, 1, 250)
         camera.position.set(-20, 5, 40)
         return camera
     }
 
     createControls(): OrbitControls {
-        const controls = new OrbitControls(this.camera, this.renderer.domElement)
+        const controls = new OrbitControls(this.camera, this.viewDOM)
         controls.maxDistance = 100
         controls.minDistance = 10
         controls.minPolarAngle = Math.PI / 4
@@ -150,12 +140,10 @@ class App {
 
     createBloom(): [THREE.Layers, EffectComposer, EffectComposer] {
         const bloomLayer = new THREE.Layers();
-        bloomLayer.set(this.BLOOM_SCENE);
+        bloomLayer.set(BLOOM_SCENE);
 
         const renderScene = new RenderPass(this.scene, this.camera);
-        const width = this.renderer.domElement.clientWidth
-        const height = this.renderer.domElement.clientHeight
-        const bloomPass = new UnrealBloomPass(new THREE.Vector2(width, height), 1, 1, 0);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(this.viewDOM.clientWidth, this.viewDOM.clientHeight), 1, 1, 0);
 
         const bloomComposer = new EffectComposer(this.renderer);
         bloomComposer.renderToScreen = false;
@@ -210,9 +198,9 @@ class App {
     }
 
     onWindowResize() {
-        this.camera.aspect = this.preview.clientWidth / this.preview.clientHeight
+        this.camera.aspect = this.viewDOM.clientWidth / this.viewDOM.clientHeight
         this.camera.updateProjectionMatrix()
-        this.renderer.setSize(this.preview.clientWidth, this.preview.clientHeight)
+        this.renderer.setSize(this.viewDOM.clientWidth, this.viewDOM.clientHeight)
         this.render()
     }
 

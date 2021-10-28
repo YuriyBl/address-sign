@@ -1,4 +1,3 @@
-import { IParams } from 'client';
 import * as THREE from 'three'
 
 export function createWall(plateDepth: number): THREE.Group {
