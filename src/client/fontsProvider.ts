@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { TTFLoader } from 'three/examples/jsm/loaders/TTFLoader'
 import meshSize from './utils/meshSize';
 
 export class Font {
@@ -17,8 +18,8 @@ export class Font {
 
     load(): Promise<Font> {
         return new Promise((resolve, reject) => {
-            new THREE.FontLoader().load(this.path, (font) => {
-                this.content = font;
+            new TTFLoader().load(this.path, (json) => {
+                this.content = new THREE.Font(json);
                 this.computeHelpers()
 
                 resolve(this);
@@ -41,10 +42,12 @@ export class Font {
 
 export class FontProvider {
     private static instance: FontProvider;
-    dimensionsFont = new Font('fonts/Roboto_Medium.json', 'Roboto');
+    dimensionsFont = new Font('fonts/roboto/Roboto-Medium.ttf', 'Roboto');
     fonts = [
-        new Font('fonts/Post_No_Bills_Colombo_Medium.json', 'Post No Bills Colombo'),
-        new Font('fonts/Magettas_Regular.json', 'Magettas'),
+        new Font('fonts/post-no-bills/postnobillscolombo-medium.ttf', 'Post No Bills Colombo'),
+        new Font('fonts/magettas/Magettas_Regular.ttf', 'Magettas'),
+        new Font('fonts/bravo/Bravo-Regular.ttf', 'Bravo Stencil'),
+        new Font('fonts/allerta-stencil/AllertaStencil-Regular.ttf', 'Allerta Stencil'),
     ];
 
     async getFont(id: number): Promise<Font> {

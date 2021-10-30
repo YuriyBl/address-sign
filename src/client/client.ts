@@ -65,12 +65,13 @@ class App {
 
     createRenderer(): THREE.WebGLRenderer {
         const renderer = new THREE.WebGLRenderer({
-            antialias: false,
+            antialias: true,
             powerPreference: 'high-performance',
             alpha: true,
         })
         renderer.setClearColor(0x393939, 0.14);
-        renderer.outputEncoding = THREE.sRGBEncoding
+        // renderer.outputEncoding = THREE.sRGBEncoding
+        renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(this.viewDOM.clientWidth, this.viewDOM.clientHeight)
         this.viewDOM.appendChild(renderer.domElement)
         return renderer
@@ -78,7 +79,7 @@ class App {
 
     createCamera(): THREE.PerspectiveCamera {
         const aspect = this.viewDOM.clientWidth / this.viewDOM.clientHeight
-        const camera = new THREE.PerspectiveCamera(75, aspect, 1, 250)
+        const camera = new THREE.PerspectiveCamera(75, aspect, 4, 2000)
         camera.position.set(-20, 5, 40)
         return camera
     }
