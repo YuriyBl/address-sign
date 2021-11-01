@@ -6,7 +6,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createWall } from './wall';
-import { Color, IPlateInput, plates } from './plates';
+import { Color, IPlateInput, plates, Size } from './plates';
 import { FontProvider } from './fontsProvider';
 import { BLOOM_SCENE } from './utils/const';
 
@@ -36,6 +36,7 @@ class App {
         glowing: false,
         colorId: 0,
         fontId: 0,
+        sizeId: 1,
         scene: new THREE.Scene(),
     }
 
@@ -231,6 +232,9 @@ class App {
         this.input.glowing = (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
         this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)
 
+        this.input.sizeId = parseInt((document.querySelector('.option input:checked') as HTMLInputElement)?.value)
+        console.log(this.input.sizeId)
+
         this.createPlate();
     }
 
@@ -270,6 +274,17 @@ class App {
         colorSelector.innerHTML += Color.list.map(
             (c, i) => `<option value="${i}" ${i == this.input.colorId ? 'selected="selected"' : ''}>${c.name}</option>`,
         ).join('\n');
+
+        const sizeOptions = document.querySelector('.options') as HTMLInputElement
+        sizeOptions.innerHTML = Size.list.map(
+            (s, i) => `
+            <div class="option">
+                <input type="radio" name="size" id="size-${s.name}" value="${i}" ${i == this.input.sizeId ? 'checked="checked"' : ''}'>
+                <label for="size-${s.name}">${s.name}</label>
+            </div>
+            `,
+        ).join('\n');
+
     }
 }
 
