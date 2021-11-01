@@ -8,7 +8,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { createWall } from './wall';
 import { Color, IPlateInput, plates, Size } from './plates';
 import { FontProvider } from './fontsProvider';
-import { BLOOM_SCENE } from './utils/const';
+import { BLOOM_SCENE, PRICE_PER_CM } from './utils/const';
+import meshSize from './utils/meshSize';
 
 class App {
     viewDOM: HTMLElement
@@ -33,6 +34,7 @@ class App {
         plateIndex: 0,
         num: '12',
         name: ['Cooper', 'Road'],
+        hasBacklight: true,
         glowing: false,
         colorId: 0,
         fontId: 0,
@@ -56,7 +58,7 @@ class App {
         this.backlightMesh = new THREE.Mesh();
         this.backlightMeshGlowing = new THREE.Mesh();
         this.dimensionsArrowsGroup = new THREE.Group();
-        this.createPlate()
+        this.applyChanges();
 
         const [bloomLayer, bloomComposer, finalComposer] = this.createBloom()
         this.bloomLayer = bloomLayer
@@ -203,6 +205,7 @@ class App {
         this.camera.aspect = this.viewDOM.clientWidth / this.viewDOM.clientHeight
         this.camera.updateProjectionMatrix()
         this.renderer.setSize(this.viewDOM.clientWidth, this.viewDOM.clientHeight)
+        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.render()
     }
 
@@ -217,25 +220,6 @@ class App {
         this.controls.update()
         this.render()
         requestAnimationFrame(() => this.update())
-    }
-
-    applyChanges() {
-        this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value);
-        this.input.fontId = parseInt((document.getElementById('font') as HTMLInputElement)?.value);
-
-        this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
-
-        this.input.name = [
-            (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
-            (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
-        ]
-        this.input.glowing = (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
-        this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)
-
-        this.input.sizeId = parseInt((document.querySelector('.option input:checked') as HTMLInputElement)?.value)
-        console.log(this.input.sizeId)
-
-        this.createPlate();
     }
 
     toggleBacklight() {
@@ -258,6 +242,42 @@ class App {
         }
     }
 
+
+    updatePrice() {
+        const basePrice = plates[this.input.plateIndex].params.basePrice!;
+        const plateSize = meshSize(this.plate)
+        const sizePrice = Math.floor((plateSize.x * plateSize.y) * PRICE_PER_CM);
+        const backlightPrice = this.input.hasBacklight ? 10 : 0;
+
+        document.querySelector('#base-price')!.innerHTML = basePrice.toString();
+        document.querySelector('#size-price')!.innerHTML = sizePrice.toString();
+        document.querySelector('#backlight-price')!.innerHTML = backlightPrice.toString();
+        (document.querySelector('#backlight-tr') as HTMLElement).style.display = this.input.hasBacklight ? 'table-row' : 'none';
+
+        document.querySelector('#total-price')!.innerHTML = (basePrice + sizePrice + backlightPrice).toString();
+    }
+
+    async applyChanges() {
+        this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value);
+        this.input.fontId = parseInt((document.getElementById('font') as HTMLInputElement)?.value);
+
+        this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
+
+        this.input.name = [
+            (document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
+            (document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
+        ]
+        this.input.hasBacklight = (document.getElementById('backlight-yes') as HTMLInputElement).checked;
+        this.input.glowing = this.input.hasBacklight && (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
+        this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value)
+
+        this.input.sizeId = parseInt((document.querySelector('.option input:checked') as HTMLInputElement)?.value)
+
+        await this.createPlate();
+        this.renderDOM();
+        this.updatePrice();
+    }
+
     renderDOM() {
         const fontSelector = document.getElementById('font') as HTMLInputElement
         fontSelector.innerHTML = FontProvider.getInstance().fonts.map(
@@ -270,8 +290,7 @@ class App {
         (document.getElementById('toggle-backlight') as HTMLInputElement).checked = this.input.glowing;
 
         const colorSelector = document.getElementById('backlight-color') as HTMLInputElement
-        colorSelector.innerHTML = `<option value="no">No backlight</option> \n`
-        colorSelector.innerHTML += Color.list.map(
+        colorSelector.innerHTML = Color.list.map(
             (c, i) => `<option value="${i}" ${i == this.input.colorId ? 'selected="selected"' : ''}>${c.name}</option>`,
         ).join('\n');
 
@@ -285,6 +304,8 @@ class App {
             `,
         ).join('\n');
 
+        (document.getElementById('backlight-yes') as HTMLInputElement).checked = this.input.hasBacklight;
+        (document.getElementById('toggle-backlight') as HTMLInputElement).disabled = !this.input.hasBacklight;
     }
 }
 

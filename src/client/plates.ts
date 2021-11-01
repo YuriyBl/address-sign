@@ -57,6 +57,7 @@ export interface IPlateInput {
     plateIndex: number;
     num: string;
     name: string[];
+    hasBacklight: boolean,
     glowing: boolean;
     colorId: number;
     fontId: number;
@@ -74,6 +75,8 @@ interface IPlateParams {
     margin: Margin;
     lineThikness?: number;
     material?: THREE.Material;
+
+    basePrice?: number;
 }
 
 const DEFAULT_PLATE_PARAMS: IPlateParams = {
@@ -86,6 +89,8 @@ const DEFAULT_PLATE_PARAMS: IPlateParams = {
     margin: new Margin(2, 2),
     lineThikness: 0.4,
     material: new THREE.MeshPhongMaterial({ color: 0x454545, side: THREE.DoubleSide }),
+
+    basePrice: 10,
 }
 
 class Plate {
@@ -308,8 +313,7 @@ export const plates = [
         return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
-        height: 9.5,
-        numSize: 5.0,
+        numSize: 5.5,
         nameSize: 1.5,
         nameIsTwoLines: false,
         margin: new Margin(1.5, 1, 0.4)
@@ -338,8 +342,7 @@ export const plates = [
         return [engravedPlateMesh, backlightMeshGlowing, backlightMesh, dimensionsArrows];
     }),
     new Plate({
-        height: 9.5,
-        numSize: 5.0,
+        numSize: 5.5,
         nameSize: 1.5,
         nameIsTwoLines: false,
         margin: new Margin(1.5, 1, 0.4)

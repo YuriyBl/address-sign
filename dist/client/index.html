@@ -86,7 +86,7 @@
 			float: left;
 		}
 
-		section main {
+		section .content {
 			padding-top: 10px;
 		}
 
@@ -94,6 +94,7 @@
 			display: flex;
 			flex-wrap: wrap;
 			flex-direction: row;
+			column-gap: 20px;
 		}
 
 		section * {
@@ -131,7 +132,14 @@
 
 		.input-wrapper {
 			margin-bottom: 10px;
-			margin-right: 20px;
+			/* margin-right: 20px; */
+			width: 270px;
+			display: flex;
+			flex-direction: column;
+		}
+
+		section .row:last-child .input-wrapper:last-child {
+			margin-bottom: 0;
 		}
 
 		.input-wrapper label {
@@ -151,12 +159,12 @@
 			color: inherit;
 			padding: 8px 10px;
 			border-radius: 5px;
-			width: 250px;
+			width: 100%;
 			font-size: 18px;
 		}
 
 		.input-wrapper select {
-			width: 250px;
+			width: 100%;
 			padding: 8px 10px;
 			font-size: 18px;
 			border: none;
@@ -209,6 +217,11 @@
 			opacity: 1;
 		}
 
+		.buttons .button input:disabled+label {
+			opacity: 0.25;
+			cursor: not-allowed;
+		}
+
 		.buttons .button label::before {
 			font-size: 30px;
 			font-family: 'Font Awesome 5 Pro';
@@ -234,7 +247,7 @@
 
 		.input-wrapper .options {
 			width: 250px;
-			display: flex;
+			display: inline-flex;
 		}
 
 		.input-wrapper .options input {
@@ -246,7 +259,9 @@
 			font-size: 18px;
 			padding: 8px 12px;
 			background: #363636;
+			color: #E5E5E5;
 			cursor: pointer;
+			margin-bottom: 0;
 		}
 
 		.input-wrapper .option:first-child label {
@@ -259,6 +274,18 @@
 
 		.input-wrapper .option input:checked+label {
 			background: #555555;
+		}
+
+		section.price .content {
+			width: 250px;
+		}
+
+		section.price table {
+			width: 100%;
+		}
+
+		section.price table td:last-child {
+			text-align: right;
 		}
 
 		@media only screen and (max-width: 1000px) {
@@ -302,9 +329,7 @@
 
 		@media only screen and (max-width: 600px) {
 
-			.input-wrapper,
-			.input-wrapper input,
-			.input-wrapper select {
+			.input-wrapper {
 				width: 100%;
 				margin-right: 0;
 			}
@@ -317,7 +342,7 @@
 		<h1>Sign settings <button id="apply">Apply changes</button></h1>
 		<section class="type">
 			<h2>Type</h2>
-			<main>
+			<div class="content">
 				<div class="types">
 					<div class="sign-type">
 						<input type="radio" name="type" id="type-1" value="0" checked>
@@ -343,46 +368,100 @@
 				<div class="row">
 					<div class="input-wrapper">
 						<label for="font">Font</label>
-						<select name="font" id="font"></select>
+						<div class="input-content">
+							<select name="font" id="font"></select>
+						</div>
 					</div>
 					<div class="input-wrapper">
 						<label>Size</label>
-						<div class="options"></div>
+						<div class="input-content">
+							<div class="options"></div>
+						</div>
 					</div>
 				</div>
 
-			</main>
+			</div>
 		</section>
 		<section class="address">
 			<h2>Address</h2>
-			<main>
+			<div class="content">
 				<div class="row">
 					<div class="input-wrapper">
 						<label for="address-line-1">Address Line 1</label>
-						<input type="text" id="address-line-1" name="address-line-1">
+						<div class="input-content">
+							<input type="text" id="address-line-1" name="address-line-1">
+						</div>
 					</div>
 					<div class="input-wrapper">
 						<label for="address-line-2">Address Line 2</label>
-						<input type="text" id="address-line-2" name="address-line-2">
+						<div class="input-content">
+							<input type="text" id="address-line-2" name="address-line-2">
+						</div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="input-wrapper">
 						<label for="street-number">Street Number</label>
-						<input type="text" id="street-number" name="street-number">
+						<div class="input-content">
+							<input type="text" id="street-number" name="street-number">
+						</div>
 					</div>
 					<div class="input-wrapper">
 						<label for="backlight-color">Color</label>
-						<select name="backlight-color" id="backlight-color"></select>
+						<div class="input-content">
+							<select name="backlight-color" id="backlight-color"></select>
+						</div>
 					</div>
 				</div>
-			</main>
+				<div class="row">
+					<div class="input-wrapper">
+						<label for="backlight-color">Add backlight</label>
+						<div class="input-content">
+							<div class="options">
+								<div class="option">
+									<input type="radio" name="backlight" id="backlight-yes" checked>
+									<label for="backlight-yes">YES</label>
+								</div>
+								<div class="option">
+									<input type="radio" name="backlight" id="backlight-no">
+									<label for="backlight-no">NO</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</section>
 		<section class="price">
 			<h2>Price</h2>
-			<main>
-
-			</main>
+			<div class="content">
+				<table>
+					<tr>
+						<td>
+							<h3>Base price: </h3>
+						</td>
+						<td>
+							<h3>$<span id="base-price">-</span></h3>
+						</td>
+					</tr>
+					<tr>
+						<td>Size:</td>
+						<td>$<span id="size-price">-</span></td>
+					</tr>
+					<tr id="backlight-tr">
+						<td>Backlight:</td>
+						<td>$<span id="backlight-price">-</span></td>
+					</tr>
+					<tr>
+						<td>
+							<h2>Total Price: </h2>
+						</td>
+						<td>
+							<h2>$<span id="total-price">-</span></h2>
+						</td>
+					</tr>
+				</table>
+			</div>
 		</section>
 	</div>
 	<div id="preview">

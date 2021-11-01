@@ -45,7 +45,7 @@ export class FontProvider {
     dimensionsFont = new Font('fonts/roboto/Roboto-Medium.ttf', 'Roboto');
     fonts = [
         new Font('fonts/post-no-bills/postnobillscolombo-medium.ttf', 'Post No Bills Colombo'),
-        new Font('fonts/magettas/Magettas_Regular.ttf', 'Magettas'),
+        new Font('fonts/magettas/Magettas-Regular.ttf', 'Magettas'),
         new Font('fonts/bravo/Bravo-Regular.ttf', 'Bravo Stencil'),
         new Font('fonts/allerta-stencil/AllertaStencil-Regular.ttf', 'Allerta Stencil'),
     ];
