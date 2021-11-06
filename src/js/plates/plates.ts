@@ -1,13 +1,13 @@
 import * as THREE from 'three';
-import meshSize from './utils/meshSize';
-import { roundedRectGeometry } from './utils/roundedRect';
-import { CSG } from './utils/CSGMesh';
-import objectSize from './utils/objectSize';
-import { FontProvider } from './fontsProvider';
-import { Font } from './fontsProvider';
-import { genTextMesh } from './utils/genTextMesh';
-import { twoSideArrowGeometry } from './utils/twoSideArrow';
-import { UNITS_TO_MM, BLOOM_SCENE } from './utils/const';
+import meshSize from '../utils/meshSize';
+import { roundedRectGeometry } from '../utils/roundedRect';
+import { CSG } from '../utils/CSGMesh';
+import objectSize from '../utils/objectSize';
+import { FontProvider } from '../fontsProvider';
+import { Font } from '../fontsProvider';
+import { genTextMesh } from '../utils/genTextMesh';
+import { twoSideArrowGeometry } from '../utils/twoSideArrow';
+import { UNITS_TO_MM, BLOOM_SCENE } from '../utils/const';
 
 class Margin {
 	h: number;

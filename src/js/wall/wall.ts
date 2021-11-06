@@ -6,7 +6,7 @@ export function createWall(plateDepth: number): THREE.Group {
 
 	const down = 10;
 	const loader = new THREE.TextureLoader();
-	loader.load('img/brick.jpg', function (texture) {
+	loader.load(require('assets/images/brick.jpg').default, function (texture) {
 		const wallMesh = new THREE.Mesh(
 			new THREE.BoxBufferGeometry(100, 50, 10),
 			new THREE.MeshPhongMaterial({
@@ -19,7 +19,7 @@ export function createWall(plateDepth: number): THREE.Group {
 		wall.add(wallMesh);
 	});
 
-	loader.load('img/brick_narrow.jpg', function (texture) {
+	loader.load(require('assets/images/brick_narrow.jpg').default, function (texture) {
 		const pole1 = new THREE.Mesh(
 			new THREE.BoxBufferGeometry(20, 55, 20),
 			new THREE.MeshPhongMaterial({
@@ -42,7 +42,7 @@ export function createWall(plateDepth: number): THREE.Group {
 		wall.add(pole2);
 	});
 
-	loader.load('img/concrete.jpg', function (texture) {
+	loader.load(require('assets/images/concrete.jpg').default, function (texture) {
 		const poleUpper1 = new THREE.Mesh(
 			new THREE.BoxBufferGeometry(23, 2.5, 23),
 			new THREE.MeshPhongMaterial({

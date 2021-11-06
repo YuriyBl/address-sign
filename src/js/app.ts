@@ -5,13 +5,14 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { createWall } from './wall';
-import { Color, IPlateInput, plates, Size } from './plates';
+import { createWall } from './wall/wall';
+import { Color, IPlateInput, plates, Size } from './plates/plates';
 import { FontProvider } from './fontsProvider';
 import { BLOOM_SCENE, PRICE_PER_CM } from './utils/const';
 import meshSize from './utils/meshSize';
+import { fragmentShader, vertexShader } from './utils/shaders';
 
-class App {
+export class App {
 	viewDOM: HTMLElement;
 	renderer: THREE.WebGLRenderer;
 	camera: THREE.PerspectiveCamera;
@@ -42,10 +43,10 @@ class App {
 		scene: new THREE.Scene(),
 	};
 
-	constructor() {
+	constructor(viewDOM: HTMLElement) {
 		this.renderDOM();
 
-		this.viewDOM = document.getElementById('preview') ?? document.body;
+		this.viewDOM = viewDOM;
 		this.renderer = this.createRenderer();
 		this.camera = this.createCamera();
 		this.controls = this.createControls();
@@ -160,8 +161,8 @@ class App {
 					baseTexture: { value: null },
 					bloomTexture: { value: bloomComposer.renderTarget2.texture },
 				},
-				vertexShader: document.getElementById('vertexshader')?.textContent ?? '',
-				fragmentShader: document.getElementById('fragmentshader')?.textContent ?? '',
+				vertexShader: vertexShader,
+				fragmentShader: fragmentShader,
 				defines: {},
 			}),
 			'baseTexture'
@@ -309,11 +310,3 @@ class App {
 		(document.getElementById('toggle-backlight') as HTMLInputElement).disabled = !this.input.hasBacklight;
 	}
 }
-
-const app = new App();
-app.update();
-
-window.addEventListener('resize', (e) => app.onWindowResize(), false);
-document.getElementById('apply')?.addEventListener('click', (e) => app.applyChanges());
-document.getElementById('toggle-backlight')?.addEventListener('change', (e) => app.toggleBacklight());
-document.getElementById('toggle-dimensions')?.addEventListener('change', (e) => app.toggleDimensions());

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Address Sign 3D</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.min.css" rel="stylesheet" type="text/css" />
+	</head>
+
+	<body>
+		<div class="settings">
+			<h1>Sign settings <button id="apply">Apply changes</button></h1>
+			<section class="type">
+				<h2>Type</h2>
+				<div class="content">
+					<div class="types">
+						<div class="sign-type">
+							<input type="radio" name="type" id="type-1" value="0" checked />
+							<label for="type-1"><img src=<%=require("assets/images/sign_types/1.svg").default%> alt="First plate design" /></label>
+						</div>
+						<div class="sign-type">
+							<input type="radio" name="type" id="type-2" value="1" />
+							<label for="type-2"><img src=<%=require("assets/images/sign_types/2.svg").default%> alt="Second plate design" /></label>
+						</div>
+						<div class="sign-type">
+							<input type="radio" name="type" id="type-3" value="2" />
+							<label for="type-3"><img src=<%=require("assets/images/sign_types/3.svg").default%> alt="Third plate design" /></label>
+						</div>
+						<div class="sign-type">
+							<input type="radio" name="type" id="type-4" value="3" />
+							<label for="type-4"><img src=<%=require("assets/images/sign_types/4.svg").default%> alt="Fourth plate design" /></label>
+						</div>
+						<div class="sign-type">
+							<input type="radio" name="type" id="type-5" value="4" />
+							<label for="type-5"><img src=<%=require("assets/images/sign_types/5.svg").default%> alt="Fifth plate design" /></label>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-wrapper">
+							<label for="font">Font</label>
+							<div class="input-content">
+								<select name="font" id="font"></select>
+							</div>
+						</div>
+						<div class="input-wrapper">
+							<label>Size</label>
+							<div class="input-content">
+								<div class="options"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="address">
+				<h2>Address</h2>
+				<div class="content">
+					<div class="row">
+						<div class="input-wrapper">
+							<label for="address-line-1">Address Line 1</label>
+							<div class="input-content">
+								<input type="text" id="address-line-1" name="address-line-1" />
+							</div>
+						</div>
+						<div class="input-wrapper">
+							<label for="address-line-2">Address Line 2</label>
+							<div class="input-content">
+								<input type="text" id="address-line-2" name="address-line-2" />
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-wrapper">
+							<label for="street-number">Street Number</label>
+							<div class="input-content">
+								<input type="text" id="street-number" name="street-number" />
+							</div>
+						</div>
+						<div class="input-wrapper">
+							<label for="backlight-color">Color</label>
+							<div class="input-content">
+								<select name="backlight-color" id="backlight-color"></select>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="input-wrapper">
+							<label for="backlight-color">Add backlight</label>
+							<div class="input-content">
+								<div class="options">
+									<div class="option">
+										<input type="radio" name="backlight" id="backlight-yes" checked />
+										<label for="backlight-yes">YES</label>
+									</div>
+									<div class="option">
+										<input type="radio" name="backlight" id="backlight-no" />
+										<label for="backlight-no">NO</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="price">
+				<h2>Price</h2>
+				<div class="content">
+					<table>
+						<tr>
+							<td>
+								<h3>Base price:</h3>
+							</td>
+							<td>
+								<h3>$<span id="base-price">-</span></h3>
+							</td>
+						</tr>
+						<tr>
+							<td>Size:</td>
+							<td>$<span id="size-price">-</span></td>
+						</tr>
+						<tr id="backlight-tr">
+							<td>Backlight:</td>
+							<td>$<span id="backlight-price">-</span></td>
+						</tr>
+						<tr>
+							<td>
+								<h2>Total Price:</h2>
+							</td>
+							<td>
+								<h2>$<span id="total-price">-</span></h2>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</section>
+		</div>
+		<div id="preview">
+			<div class="buttons">
+				<div class="button backlight">
+					<input type="checkbox" name="toggle-backlight" id="toggle-backlight" />
+					<label for="toggle-backlight"> </label>
+				</div>
+
+				<div class="button dimensions">
+					<input type="checkbox" name="toggle-dimensions" id="toggle-dimensions" />
+					<label for="toggle-dimensions"> </label>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
