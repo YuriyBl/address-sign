@@ -5,113 +5,115 @@ const MiniCSSExtractPlugin = require('mini-css-extract-plugin');
 const CSSMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 
-const isDev = process.env.NODE_ENV === 'development';
-const isProd = !isDev;
+module.exports = (env, argv) => {
+	const isDev = argv.mode === 'development';
+	const isProd = !isDev;
 
-const optimization = () => {
-	const config = {
-		splitChunks: {
-			chunks: isProd ? 'all' : 'async',
-		},
+	const optimization = () => {
+		const config = {
+			splitChunks: {
+				chunks: isProd ? 'all' : 'async',
+			},
+		};
+
+		if (isProd) {
+			config.minimizer = [new CSSMinimizerPlugin(), new TerserWebpackPlugin()];
+		}
+
+		return config;
 	};
 
-	if (isProd) {
-		config.minimizer = [new CSSMinimizerPlugin(), new TerserWebpackPlugin()];
-	}
+	const filename = (ext) => {
+		if (ext) {
+			return isDev ? `[name].${ext}` : `[name].[contenthash].${ext}`;
+		} else {
+			return isDev ? `[name].[ext]` : `[name].[contenthash].[ext]`;
+		}
+	};
 
-	return config;
-};
+	const plugins = () => {
+		const base = [
+			new HTMLWebpackPlugin({
+				template: './index.html',
+				minify: {
+					collapseWhitespace: isProd,
+				},
+			}),
+			new CleanWebpackPlugin(),
+			new MiniCSSExtractPlugin({
+				filename: filename('css'),
+			}),
+		];
 
-const filename = (ext) => {
-	if (ext) {
-		return isDev ? `[name].${ext}` : `[name].[contenthash].${ext}`;
-	} else {
-		return isDev ? `[name].[ext]` : `[name].[contenthash].[ext]`;
-	}
-};
+		return base;
+	};
 
-const plugins = () => {
-	const base = [
-		new HTMLWebpackPlugin({
-			template: './index.html',
-			minify: {
-				collapseWhitespace: isProd,
-			},
-		}),
-		new CleanWebpackPlugin(),
-		new MiniCSSExtractPlugin({
-			filename: filename('css'),
-		}),
-	];
-
-	return base;
-};
-
-module.exports = {
-	mode: 'development',
-	context: path.resolve(__dirname, 'src'),
-	entry: {
-		main: ['@babel/polyfill', './js/index.ts'],
-	},
-	output: {
-		filename: filename('js'),
-		path: path.resolve(__dirname, 'dist'),
-	},
-	resolve: {
-		extensions: ['.ts', '.js'],
-		alias: {
-			assets: path.resolve(__dirname, 'src/assets/'),
+	return {
+		mode: 'development',
+		context: path.resolve(__dirname, 'src'),
+		entry: {
+			main: ['@babel/polyfill', './js/index.ts'],
 		},
-	},
-	module: {
-		rules: [
-			{
-				test: /\.s[ac]ss$/,
-				use: [MiniCSSExtractPlugin.loader, 'css-loader', 'sass-loader'],
+		output: {
+			filename: filename('js'),
+			path: path.resolve(__dirname, 'dist'),
+		},
+		resolve: {
+			extensions: ['.ts', '.js'],
+			alias: {
+				assets: path.resolve(__dirname, 'src/assets/'),
 			},
-			{
-				test: /\.tsx?$/,
-				use: [
-					{
-						loader: 'babel-loader',
-						options: {
-							presets: ['@babel/preset-env'],
+		},
+		module: {
+			rules: [
+				{
+					test: /\.s[ac]ss$/,
+					use: [MiniCSSExtractPlugin.loader, 'css-loader', 'sass-loader'],
+				},
+				{
+					test: /\.tsx?$/,
+					use: [
+						{
+							loader: 'babel-loader',
+							options: {
+								presets: ['@babel/preset-env'],
+							},
 						},
-					},
-					'ts-loader',
-				],
-				exclude: /node_modules/,
-			},
-			{
-				test: /\.(png|jpg|jpeg|svg|gif)$/,
-				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: `assets/images/${filename()}`,
+						'ts-loader',
+					],
+					exclude: /node_modules/,
+				},
+				{
+					test: /\.(png|jpg|jpeg|svg|gif)$/,
+					use: [
+						{
+							loader: 'file-loader',
+							options: {
+								name: `assets/images/${filename()}`,
+							},
 						},
-					},
-				],
-			},
-			{
-				test: /\.(ttf)$/,
-				use: [
-					{
-						loader: 'file-loader',
-						options: {
-							name: `assets/fonts/${filename()}`,
-							esModule: false,
+					],
+				},
+				{
+					test: /\.(ttf)$/,
+					use: [
+						{
+							loader: 'file-loader',
+							options: {
+								name: `assets/fonts/${filename()}`,
+								esModule: false,
+							},
 						},
-					},
-				],
-			},
-		],
-	},
-	plugins: plugins(),
-	optimization: optimization(),
-	devServer: {
-		port: 3000,
-		hot: isDev,
-	},
-	devtool: isDev ? 'source-map' : false,
+					],
+				},
+			],
+		},
+		plugins: plugins(),
+		optimization: optimization(),
+		devServer: {
+			port: 3000,
+			hot: isDev,
+		},
+		devtool: isDev ? 'source-map' : false,
+	};
 };

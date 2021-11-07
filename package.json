@@ -4,10 +4,10 @@
 	"description": "",
 	"private": true,
 	"scripts": {
-		"build-dev": "cross-env NODE_ENV=development webpack --mode development",
-		"build-prod": "cross-env NODE_ENV=production webpack --mode production",
-		"serve-dev": "cross-env NODE_ENV=development webpack-dev-server --mode development --open",
-		"serve-prod": "cross-env NODE_ENV=production webpack-dev-server --mode production --open"
+		"build-dev": "webpack --mode development",
+		"build-prod": "webpack --mode production",
+		"serve-dev": "webpack-dev-server --mode development --open",
+		"serve-prod": "webpack-dev-server --mode production --open"
 	},
 	"browserslist": "> 0.25%, not dead",
 	"author": "Yurii Bliusiuk <ura.blusuk@gmail.com>",
