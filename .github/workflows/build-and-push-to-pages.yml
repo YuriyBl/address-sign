@@ -1,36 +1,39 @@
 name: Build and push to YuriyBl.github.io
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+ push:
+  branches: [master]
+ pull_request:
+  branches: [master]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    env:
-      NODE_ENV: production
-    
-    steps:
-    - name: Checkout the repository
-      uses: actions/checkout@master
-      
-    - name: Install Dependencies
-      run: npm install
-      
-    - name: Build for production
-      run: npm run build-prod
-    
-    - name: Deploy to Github pages
-      uses: cpina/github-action-push-to-another-repository@main
-      env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-      with:
-        source-directory: 'dist'
-        target-directory: 'projects/address-sign'
-        destination-github-username: 'yuriybl'
-        destination-repository-name: 'YuriyBl.github.io'
-        user-email: ura.blusuk@gmail.com
-        target-branch: master
+ build:
+  runs-on: ubuntu-latest
+
+  steps:
+   - name: Checkout the repository
+     uses: actions/checkout@master
+
+  - name: Node.js setup
+    uses: actions/setup-node@v2
+    with:
+      node-version: '15'
+      cache: 'npm'
+
+   - name: Install Dependencies
+     run: npm install
+
+   - name: Build for production
+     run: npm run build-prod
+
+   - name: Deploy to Github pages
+     uses: cpina/github-action-push-to-another-repository@main
+     env:
+      API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+     with:
+      source-directory: 'dist'
+      target-directory: 'projects/address-sign'
+      destination-github-username: 'yuriybl'
+      destination-repository-name: 'YuriyBl.github.io'
+      user-email: ura.blusuk@gmail.com
+      target-branch: master
