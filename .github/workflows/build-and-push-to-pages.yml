@@ -14,9 +14,9 @@ jobs:
    - name: Checkout the repository
      uses: actions/checkout@master
 
-  - name: Node.js setup
-    uses: actions/setup-node@v2
-    with:
+   - name: Node.js setup
+     uses: actions/setup-node@v2
+     with:
       node-version: '15'
       cache: 'npm'
 
