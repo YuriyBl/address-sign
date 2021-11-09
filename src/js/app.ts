@@ -6,11 +6,23 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { createWall } from './wall/wall';
-import { Color, IPlateInput, plates, Size } from './plates/plates';
+import { Color, plates, Size } from './plates/plates';
 import { FontProvider } from './fontsProvider';
-import { BLOOM_SCENE, PRICE_PER_CM } from './utils/const';
+import { BACKLIGHT_PRICE_PER_CM, BLOOM_SCENE, PRICE_PER_CM } from './utils/const';
 import meshSize from './utils/meshSize';
 import { fragmentShader, vertexShader } from './utils/shaders';
+
+export interface IAppInput {
+	plateIndex: number;
+	num: string;
+	name: string[];
+	hasBacklight: boolean;
+	backlightIsOn: boolean;
+	showDimensions: boolean;
+	colorId: number;
+	fontId: number;
+	sizeId: number;
+}
 
 export class App {
 	viewDOM: HTMLElement;
@@ -31,16 +43,16 @@ export class App {
 	backlightMesh: THREE.Mesh;
 	dimensionsArrowsGroup: THREE.Group;
 
-	input: IPlateInput = {
+	input: IAppInput = {
 		plateIndex: 0,
 		num: '12',
 		name: ['Cooper', 'Road'],
 		hasBacklight: true,
-		glowing: false,
+		backlightIsOn: false,
+		showDimensions: false,
 		colorId: 0,
 		fontId: 0,
 		sizeId: 1,
-		scene: new THREE.Scene(),
 	};
 
 	constructor(viewDOM: HTMLElement) {
@@ -51,7 +63,6 @@ export class App {
 		this.camera = this.createCamera();
 		this.controls = this.createControls();
 		this.scene = this.createScene();
-		this.input.scene = this.scene;
 		this.createLights();
 		this.createWall();
 
@@ -129,7 +140,8 @@ export class App {
 	}
 
 	async createPlate() {
-		const [newPlate, newBacklightMeshGlowing, newBacklightMesh, newDimensionsArrowsGroup] = await plates[this.input.plateIndex].generate(this.input);
+		const signParts = await plates[this.input.plateIndex].generate(this.input);
+		const [newPlate, newBacklightMeshGlowing, newBacklightMesh, newDimensionsArrowsGroup] = signParts;
 
 		this.scene.remove(this.plate, this.backlightMeshGlowing, this.backlightMesh, this.dimensionsArrowsGroup);
 
@@ -224,9 +236,10 @@ export class App {
 		requestAnimationFrame(() => this.update());
 	}
 
-	toggleBacklight() {
-		const backlightIsOn = (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
-		if (this.input.hasBacklight && backlightIsOn) {
+	toggleBacklight(backlightIsOn?: boolean) {
+		if (backlightIsOn != undefined) this.input.backlightIsOn = backlightIsOn;
+
+		if (this.input.hasBacklight && this.input.backlightIsOn) {
 			this.scene.remove(this.backlightMesh);
 			this.scene.add(this.backlightMeshGlowing);
 		} else {
@@ -235,8 +248,10 @@ export class App {
 		}
 	}
 
-	toggleDimensions() {
-		if ((document.getElementById('toggle-dimensions') as HTMLInputElement).checked) {
+	toggleDimensions(showDimensions?: boolean) {
+		if (showDimensions != undefined) this.input.showDimensions = showDimensions;
+
+		if (this.input.showDimensions) {
 			this.scene.add(this.dimensionsArrowsGroup);
 		} else {
 			this.scene.remove(this.dimensionsArrowsGroup);
@@ -246,8 +261,8 @@ export class App {
 	updatePrice() {
 		const basePrice = plates[this.input.plateIndex].params.basePrice!;
 		const plateSize = meshSize(this.plate);
-		const sizePrice = Math.floor(plateSize.x * plateSize.y * PRICE_PER_CM);
-		const backlightPrice = this.input.hasBacklight ? 10 : 0;
+		const sizePrice = Math.round(plateSize.x * plateSize.y * PRICE_PER_CM);
+		const backlightPrice = this.input.hasBacklight ? Math.round(plateSize.x * plateSize.y * BACKLIGHT_PRICE_PER_CM) : 0;
 
 		document.querySelector('#base-price')!.innerHTML = basePrice.toString();
 		document.querySelector('#size-price')!.innerHTML = sizePrice.toString();
@@ -257,22 +272,49 @@ export class App {
 		document.querySelector('#total-price')!.innerHTML = (basePrice + sizePrice + backlightPrice).toString();
 	}
 
+	setNum(num: string) {
+		this.input.num = num;
+		this.applyChanges();
+	}
+
+	setName1(name: string) {
+		this.input.name[0] = name;
+		this.applyChanges();
+	}
+
+	setName2(name: string) {
+		this.input.name[1] = name;
+		this.applyChanges();
+	}
+
+	setPlateIndex(plateIndex: number) {
+		this.input.plateIndex = plateIndex;
+		this.applyChanges();
+	}
+
+	setFontId(fontId: number) {
+		this.input.fontId = fontId;
+		this.applyChanges();
+	}
+
+	setHasBacklight(hasBacklight: boolean) {
+		this.input.hasBacklight = hasBacklight;
+		this.toggleBacklight();
+		this.renderDOM();
+		this.updatePrice();
+	}
+
+	setColorId(colorId: number) {
+		this.input.colorId = colorId;
+		this.applyChanges();
+	}
+
+	setSizeId(sizeId: number) {
+		this.input.sizeId = sizeId;
+		this.applyChanges();
+	}
+
 	async applyChanges() {
-		this.input.plateIndex = parseInt((document.querySelector('input[name="type"]:checked') as HTMLInputElement)?.value);
-		this.input.fontId = parseInt((document.getElementById('font') as HTMLInputElement)?.value);
-
-		this.input.num = (document.getElementById('street-number') as HTMLInputElement)?.value;
-
-		this.input.name = [
-			(document.getElementById('address-line-1') as HTMLInputElement)?.value.trim(),
-			(document.getElementById('address-line-2') as HTMLInputElement)?.value.trim(),
-		];
-		this.input.hasBacklight = (document.getElementById('backlight-yes') as HTMLInputElement).checked;
-		this.input.glowing = this.input.hasBacklight && (document.getElementById('toggle-backlight') as HTMLInputElement).checked;
-		this.input.colorId = parseInt((document.getElementById('backlight-color') as HTMLInputElement)?.value);
-
-		this.input.sizeId = parseInt((document.querySelector('.option input:checked') as HTMLInputElement)?.value);
-
 		await this.createPlate();
 		this.renderDOM();
 		this.updatePrice();
@@ -287,26 +329,26 @@ export class App {
 		(document.getElementById('street-number') as HTMLInputElement).value = this.input.num;
 		(document.getElementById('address-line-1') as HTMLInputElement).value = this.input.name[0];
 		(document.getElementById('address-line-2') as HTMLInputElement).value = this.input.name[1];
-		(document.getElementById('toggle-backlight') as HTMLInputElement).checked = this.input.glowing;
+		(document.getElementById('toggle-backlight') as HTMLInputElement).checked = this.input.backlightIsOn;
 
 		const colorSelector = document.getElementById('backlight-color') as HTMLInputElement;
 		colorSelector.innerHTML = Color.list
 			.map((c, i) => `<option value="${i}" ${i == this.input.colorId ? 'selected="selected"' : ''}>${c.name}</option>`)
 			.join('\n');
 
-		const sizeOptions = document.querySelector('.options') as HTMLInputElement;
-		sizeOptions.innerHTML = Size.list
+		const sizes = document.querySelector('#sizes') as HTMLElement;
+		sizes.innerHTML = Size.list
 			.map(
 				(s, i) => `
-            <div class="option">
-                <input type="radio" name="size" id="size-${s.name}" value="${i}" ${i == this.input.sizeId ? 'checked="checked"' : ''}'>
-                <label for="size-${s.name}">${s.name}</label>
-            </div>
-            `
+							<div class="option">
+									<input type="radio" name="size" id="size-${s.name}" value="${i}" ${i == this.input.sizeId ? 'checked="checked"' : ''}'>
+									<label for="size-${s.name}">${s.name}</label>
+							</div>
+							`
 			)
 			.join('\n');
 
-		(document.getElementById('backlight-yes') as HTMLInputElement).checked = this.input.hasBacklight;
+		(document.querySelector('input[name="backlight"][value="yes"]') as HTMLInputElement).checked = this.input.hasBacklight;
 		(document.getElementById('toggle-backlight') as HTMLInputElement).disabled = !this.input.hasBacklight;
 	}
 }

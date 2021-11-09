@@ -2,7 +2,8 @@
 	"compilerOptions": {
 		"moduleResolution": "node",
 		"strict": true,
-		"baseUrl": "./"
+		"baseUrl": "./",
+		"lib": ["es6", "dom"]
 	},
 	"include": ["**/*.ts"]
 }

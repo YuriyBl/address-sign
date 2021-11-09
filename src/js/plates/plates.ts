@@ -2,12 +2,12 @@ import * as THREE from 'three';
 import meshSize from '../utils/meshSize';
 import { roundedRectGeometry } from '../utils/roundedRect';
 import { CSG } from '../utils/CSGMesh';
-import objectSize from '../utils/objectSize';
 import { FontProvider } from '../fontsProvider';
 import { Font } from '../fontsProvider';
 import { genTextMesh } from '../utils/genTextMesh';
 import { twoSideArrowGeometry } from '../utils/twoSideArrow';
 import { UNITS_TO_MM, BLOOM_SCENE } from '../utils/const';
+import { IAppInput } from '../app';
 
 class Margin {
 	h: number;
@@ -35,18 +35,6 @@ export class Size {
 	public getMultVector() {
 		return new THREE.Vector3(this.mult, this.mult, this.mult);
 	}
-}
-
-export interface IPlateInput {
-	plateIndex: number;
-	num: string;
-	name: string[];
-	hasBacklight: boolean;
-	glowing: boolean;
-	colorId: number;
-	fontId: number;
-	sizeId: number;
-	scene: THREE.Scene; // DEBUG ONLY
 }
 
 interface IPlateParams {
@@ -79,17 +67,17 @@ const DEFAULT_PLATE_PARAMS: IPlateParams = {
 
 class Plate {
 	params: IPlateParams;
-	generate: (text: IPlateInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>;
+	generate: (text: IAppInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>;
 
 	constructor(
 		params: IPlateParams,
-		generate: (params: IPlateParams) => (text: IPlateInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>
+		generate: (params: IPlateParams) => (text: IAppInput) => Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]>
 	) {
 		this.params = { ...DEFAULT_PLATE_PARAMS, ...params };
 		this.generate = generate(this.params);
 	}
 
-	static genNumText(font: Font, input: IPlateInput, params: IPlateParams): [THREE.Mesh, THREE.Vector3] {
+	static genNumText(font: Font, input: IAppInput, params: IPlateParams): [THREE.Mesh, THREE.Vector3] {
 		const numTextMesh = genTextMesh({
 			text: input.num,
 			font: font.content!,
@@ -102,7 +90,7 @@ class Plate {
 		return [numTextMesh, numTextSize];
 	}
 
-	static genNameText(font: Font, input: IPlateInput, params: IPlateParams): [THREE.Mesh, THREE.Vector3] {
+	static genNameText(font: Font, input: IAppInput, params: IPlateParams): [THREE.Mesh, THREE.Vector3] {
 		let nameTextCSG = new CSG();
 		if (params.nameIsTwoLines) {
 			const name1TextMesh = genTextMesh({
@@ -126,7 +114,12 @@ class Plate {
 			nameTextCSG = nameTextCSG.union(CSG.fromMesh(name2TextMesh));
 		} else {
 			const nameTextMesh = new THREE.Mesh(
-				new THREE.TextBufferGeometry(input.name.join(' '), { font: font.content!, size: params.nameSize, height: params.depth, curveSegments: 5 })
+				new THREE.TextBufferGeometry(input.name.join(' '), {
+					font: font.content!,
+					size: params.nameSize,
+					height: params.depth,
+					curveSegments: 5,
+				})
 			);
 			nameTextMesh.translateZ(-params.depth! / 2);
 
@@ -151,7 +144,7 @@ class Plate {
 		plateHeight: number,
 		engraveGroup: THREE.Group,
 		params: IPlateParams,
-		input: IPlateInput
+		input: IAppInput
 	): [THREE.Mesh, THREE.Mesh, THREE.Mesh] {
 		const plateMesh = new THREE.Mesh(roundedRectGeometry(plateWidth, plateHeight, params.depth!, params.radius!));
 
@@ -234,7 +227,7 @@ export const plates = [
 			margin: new Margin(2, 2, 1.5),
 		},
 		(params) =>
-			async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
+			async (input: IAppInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
 				const font = await FontProvider.getInstance().getFont(input.fontId);
 
 				const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -260,7 +253,8 @@ export const plates = [
 					o.translateY(-params.numSize / 2);
 				});
 
-				const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+				const plateParts = Plate.genPlates(plateWidth, params.height!, engraveGroup, params, input);
+				const [engravedPlateMesh, backlightMeshGlowing, backlightMesh] = plateParts;
 
 				const plateSize = meshSize(engravedPlateMesh);
 				const dimensionsArrows = await Plate.genDimensionsArrows(plateSize.x, plateSize.y);
@@ -276,7 +270,7 @@ export const plates = [
 			margin: new Margin(2, 2),
 		},
 		(params) =>
-			async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
+			async (input: IAppInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
 				const font = await FontProvider.getInstance().getFont(input.fontId);
 
 				const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -293,7 +287,6 @@ export const plates = [
 				marginLeft += params.lineThikness! + params.margin.h;
 				nameTextMesh.translateX(marginLeft);
 				nameTextMesh.translateY(params.numSize / 2 - font.getLowerCaseHeight(params.nameSize) / 2);
-				console.log(font.lowerCaseHeight! * params.nameSize, font.getLowerCaseHeight(params.nameSize));
 
 				marginLeft += nameTextSize.x + params.margin.h;
 
@@ -321,7 +314,7 @@ export const plates = [
 			margin: new Margin(1.5, 1, 0.4),
 		},
 		(params) =>
-			async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
+			async (input: IAppInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
 				const font = await FontProvider.getInstance().getFont(input.fontId);
 
 				const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -357,7 +350,7 @@ export const plates = [
 			margin: new Margin(1.5, 1, 0.4),
 		},
 		(params) =>
-			async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
+			async (input: IAppInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
 				const font = await FontProvider.getInstance().getFont(input.fontId);
 
 				const [numTextMesh, numTextSize] = Plate.genNumText(font, input, params);
@@ -394,7 +387,7 @@ export const plates = [
 			margin: new Margin(2, 2),
 		},
 		(params) =>
-			async (input: IPlateInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
+			async (input: IAppInput): Promise<[THREE.Mesh, THREE.Mesh, THREE.Mesh, THREE.Group]> => {
 				const plateGroup = new THREE.Group();
 				const font = await FontProvider.getInstance().getFont(input.fontId);
 

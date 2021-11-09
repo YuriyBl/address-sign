@@ -1,3 +1,5 @@
+@import './font-awesome.sass'
+	
 *,
 *::before,
 *::after
@@ -56,9 +58,6 @@ body
 			background-color: #363636
 			transform: scale(0.96)
 
-		&#apply
-			margin-left: 30px
-
 section
 	margin-top: 25px
 	width: 100%
@@ -105,8 +104,6 @@ section
 	width: 270px
 	display: flex
 	flex-direction: column
-	&:last-child
-			margin-bottom: 0
 
 	label
 		display: block
@@ -224,11 +221,6 @@ section.price
 @media only screen and (max-width: 1000px) 
 	body
 		flex-direction: column-reverse
-
-	button#apply
-		display: block
-		margin-top: 10px
-		margin-left: 0
 
 	.settings, #preview
 		width: 100%

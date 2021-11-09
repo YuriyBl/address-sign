@@ -3,16 +3,17 @@
 	<head>
 		<title>Address Sign 3D</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.min.css" rel="stylesheet" type="text/css" />
+		<!-- <link href="https://cdn.jsdelivr.net/gh/hung1001/font-awesome-pro@4cac1a6/css/all.min.css" rel="stylesheet" type="text/css" /> -->
 	</head>
 
 	<body>
+		<div class="loading-overlay"></div>
 		<div class="settings">
-			<h1>Sign settings <button id="apply">Apply changes</button></h1>
+			<h1>Sign settings</h1>
 			<section class="type">
 				<h2>Type</h2>
 				<div class="content">
-					<div class="types">
+					<div class="types" id="types">
 						<div class="sign-type">
 							<input type="radio" name="type" id="type-1" value="0" checked />
 							<label for="type-1"><img src=<%=require("assets/images/sign_types/1.svg").default%> alt="First plate design" /></label>
@@ -44,7 +45,7 @@
 						<div class="input-wrapper">
 							<label>Size</label>
 							<div class="input-content">
-								<div class="options"></div>
+								<div class="options" id="sizes"></div>
 							</div>
 						</div>
 					</div>
@@ -85,13 +86,13 @@
 						<div class="input-wrapper">
 							<label for="backlight-color">Add backlight</label>
 							<div class="input-content">
-								<div class="options">
+								<div class="options" id="has-backlight">
 									<div class="option">
-										<input type="radio" name="backlight" id="backlight-yes" checked />
+										<input type="radio" name="backlight" value="yes" id="backlight-yes" checked />
 										<label for="backlight-yes">YES</label>
 									</div>
 									<div class="option">
-										<input type="radio" name="backlight" id="backlight-no" />
+										<input type="radio" name="backlight" value="no" id="backlight-no" />
 										<label for="backlight-no">NO</label>
 									</div>
 								</div>
