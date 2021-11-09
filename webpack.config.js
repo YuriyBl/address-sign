@@ -12,7 +12,7 @@ module.exports = (env, argv) => {
 	const optimization = () => {
 		const config = {
 			splitChunks: {
-				chunks: isProd ? 'all' : 'async',
+				chunks: isProd ? 'all' : 'initial',
 			},
 		};
 
@@ -49,7 +49,7 @@ module.exports = (env, argv) => {
 	};
 
 	return {
-		mode: 'development',
+		mode: argv.mode,
 		context: path.resolve(__dirname, 'src'),
 		entry: {
 			main: ['@babel/polyfill', './js/index.ts'],
@@ -81,6 +81,7 @@ module.exports = (env, argv) => {
 						},
 						'ts-loader',
 					],
+					include: path.join(__dirname, 'src'),
 					exclude: /node_modules/,
 				},
 				{
@@ -113,6 +114,9 @@ module.exports = (env, argv) => {
 		devServer: {
 			port: 3000,
 			hot: isDev,
+		},
+		performance: {
+			hints: false,
 		},
 		devtool: isDev ? 'source-map' : false,
 	};
