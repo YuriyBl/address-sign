@@ -315,9 +315,15 @@ export class App {
 	}
 
 	async applyChanges() {
-		await this.createPlate();
-		this.renderDOM();
-		this.updatePrice();
+		document.querySelector('.loading-overlay')?.classList.add('show');
+
+		setTimeout(async () => {
+			await this.createPlate();
+			this.renderDOM();
+			this.updatePrice();
+
+			document.querySelector('.loading-overlay')?.classList.remove('show');
+		}, 100);
 	}
 
 	renderDOM() {
